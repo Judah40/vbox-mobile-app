@@ -9,15 +9,16 @@ const InitialLayout = () => {
   const segments = useSegments();
   const router = useRouter();
   useEffect(() => {
-    router.push('/loading-page');
-    if (!initialized) return;
-    const inAuthGroup = segments[0] === '(app)';
+    // router.push('/loading-page');
+    // if (!initialized) return;
+    // const inAuthGroup = segments[0] === '(app)';
 
-    if (authState?.authenticated && inAuthGroup) {
-      router.replace('/(app)');
-    } else if (!authState?.authenticated) {
-      router.replace('/(auth)/login');
-    }
+    // if (authState?.authenticated && inAuthGroup) {
+    //   router.replace('/(app)');
+    // } else if (!authState?.authenticated) {
+    //   router.replace('/(auth)/login');
+    // }
+    router.replace('/Home');
   }, [authState, initialized]);
   return <Slot />;
 };
@@ -25,11 +26,11 @@ const InitialLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-        <GestureHandlerRootView>
-      <BottomSheetModalProvider>
+      <GestureHandlerRootView>
+        <BottomSheetModalProvider>
           <InitialLayout />
-      </BottomSheetModalProvider>
-        </GestureHandlerRootView>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </AuthProvider>
   );
 }

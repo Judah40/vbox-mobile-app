@@ -127,8 +127,7 @@ const Register = () => {
         index={1}
         ref={bottomSheetModalRef}
         enableDismissOnClose={false} // Prevents closing the modal
-        onChange={handleSheetChanges}
-        >
+        onChange={handleSheetChanges}>
         <View className="flex-1 bg-gray-900"></View>
         <BottomSheetView></BottomSheetView>
       </BottomSheetModal>

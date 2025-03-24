@@ -9,6 +9,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 // Define types for the data
 interface MediaItem {
@@ -48,31 +49,42 @@ const EntertainmentApp: React.FC<EntertainmentAppProps> = ({ data }) => {
   };
 
   // Media item component
-  const MediaCard: React.FC<{ item: MediaItem }> = ({ item }) => (
-    <TouchableOpacity className="mr-4 w-40 overflow-hidden rounded-lg" activeOpacity={0.9}>
-      <View className="overflow-hidden rounded-lg bg-gray-900 shadow-lg">
-        <Image
-          source={{ uri: item.bannerUrl }}
-          className="h-56 w-40 rounded-t-lg"
-          resizeMode="cover"
-          
-        />
-        <View className="bg-black bg-opacity-80 p-2">
-          <Text className="font-semibold text-white" numberOfLines={1}>
-            {item.caption}
-          </Text>
-          <View className="items-left mt-1">
-            <Text className="mr-2 text-xs text-gray-400">{item.location}</Text>
-            <View className="flex-row items-center">
-              <Ionicons name="heart-outline" size={12} color="#9CA3AF" />
-              <Text className="ml-1 text-xs text-gray-400">{item.likeCount}</Text>
+  const MediaCard: React.FC<{ item: MediaItem }> = ({ item }) => {
+    const router = useRouter();
+
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          console.log(item);
+          router.push({
+            pathname: '/Player/',
+            params: { url: item.id },
+          });
+        }}
+        className="mr-4 w-40 overflow-hidden rounded-lg"
+        activeOpacity={0.9}>
+        <View className="overflow-hidden rounded-lg bg-gray-900 shadow-lg">
+          <Image
+            source={{ uri: item.bannerUrl }}
+            className="h-56 w-40 rounded-t-lg"
+            resizeMode="cover"
+          />
+          <View className="bg-black bg-opacity-80 p-2">
+            <Text className="font-semibold text-white" numberOfLines={1}>
+              {item.caption}
+            </Text>
+            <View className="items-left mt-1">
+              <Text className="mr-2 text-xs text-gray-400">{item.location}</Text>
+              <View className="flex-row items-center">
+                <Ionicons name="heart-outline" size={12} color="#9CA3AF" />
+                <Text className="ml-1 text-xs text-gray-400">{item.likeCount}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
-
+      </TouchableOpacity>
+    );
+  };
   // Category row component
   const CategoryRow: React.FC<{ title: string; data: MediaItem[] }> = ({ title, data }) => (
     <View className="mb-6">
@@ -89,7 +101,7 @@ const EntertainmentApp: React.FC<EntertainmentAppProps> = ({ data }) => {
   );
 
   return (
-    <View className="flex-1 bg-black my-4">
+    <View className="my-4 flex-1 bg-black">
       {/* Featured Banner */}
       <View className="px-4 pb-4">
         <TouchableOpacity activeOpacity={0.9}>

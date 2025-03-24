@@ -46,6 +46,7 @@ export default function TabLayout() {
           headerRight: () => <View></View>,
         }}
       />
+      <Tabs.Screen name="Preview" options={{ href: null }} />
     </Tabs>
   );
 }

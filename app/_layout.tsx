@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import 'react-native-reanimated';
 const InitialLayout = () => {
   const { authState, initialized } = useAuth();
   const segments = useSegments();

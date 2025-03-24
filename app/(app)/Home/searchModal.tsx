@@ -56,7 +56,15 @@ export default function Modal() {
           textStyle={{ color: 'white' }}
         />
       )}
-      <SearchListRender data={data} />
+      <SearchListRender
+        data={data}
+        onCardPress={(data) => {
+          router.push({
+            pathname: '/Player',
+            params: { url: data },
+          });
+        }}
+      />
     </View>
   );
 }

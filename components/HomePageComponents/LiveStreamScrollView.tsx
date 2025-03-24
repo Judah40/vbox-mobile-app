@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, View, FlatList, Dimensions, ImageBackground } from 'react-native';
+import { Text, View, FlatList, Dimensions, ImageBackground, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface CardItem {
   id: string;
@@ -8,49 +9,93 @@ interface CardItem {
   views: number;
   isLive: boolean;
   imageUri: string;
+  channelName?: string;
+  duration?: string;
 }
 
 interface HorizontalCardListProps {
   data: CardItem[];
+  onCardPress?: (item: CardItem) => void;
 }
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
+const CARD_HEIGHT = 220;
 
-const LiveStreamScrollView: React.FC<HorizontalCardListProps> = ({ data }) => {
+const LiveStreamScrollView: React.FC<HorizontalCardListProps> = ({ data, onCardPress }) => {
+  const formatViewCount = (views: number): string => {
+    if (views >= 1000000) {
+      return `${(views / 1000000).toFixed(1)}M`;
+    } else if (views >= 1000) {
+      return `${(views / 1000).toFixed(1)}K`;
+    }
+    return views.toString();
+  };
+
   const renderCard = ({ item }: { item: CardItem }) => {
     return (
-      <View className="mx-1 overflow-hidden rounded-xl" style={{ width: CARD_WIDTH, height: 200 }}>
-        {/* Card Background Image */}
-        <ImageBackground resizeMode='contain' source={{ uri: item.imageUri }} className="flex-1 bg-gray-700">
+      <TouchableOpacity 
+        onPress={() => onCardPress && onCardPress(item)}
+        className="mx-1 rounded-xl overflow-hidden shadow-lg"
+        style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
+      >
+        <ImageBackground
+          source={{ uri: item.imageUri }}
+          className="w-full h-full"
+          resizeMode="cover"
+        >
+          {/* Gradient overlay for better text visibility */}
           <LinearGradient
-            colors={['rgba(0,0,0,0.7)', 'transparent', 'rgba(0,0,0,0.8)']}
-            className="flex-1 justify-between p-3">
-            {/* Top Row with Views and Live Status */}
-            <View className="flex-row justify-between">
-              {/* Views Count at Top Left */}
-              <View className="rounded-full bg-black/60 px-2 py-1">
-                <Text className="text-xs font-semibold text-white">{item.views} views</Text>
-              </View>
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+            className="absolute inset-0"
+          />
 
-              {/* Live Indicator at Top Right */}
-              {item.isLive && (
-                <View className="flex-row items-center rounded-full bg-red-500/70 px-2 py-1">
-                  <View className="mr-1 h-1.5 w-1.5 rounded-full bg-white" />
-                  <Text className="text-xs font-bold text-white">LIVE</Text>
-                </View>
-              )}
-            </View>
-
-            {/* Card Title at Bottom */}
-            <View className="w-full">
-              <Text className="text-base font-bold text-white" numberOfLines={2}>
-                {item.title}
+          {/* Top content */}
+          <View className="flex-row justify-between p-3">
+            {/* Views count with icon */}
+            <View className="bg-black/60 rounded-full px-3 py-1 flex-row items-center">
+              <FontAwesome name="eye" size={14} color="white" className="mr-1" />
+              <Text className="text-white text-xs font-medium ml-1">
+                {formatViewCount(item.views)}
               </Text>
             </View>
-          </LinearGradient>
+
+            {/* Live indicator */}
+            {item.isLive && (
+              <View className="bg-red-600 rounded-full px-3 py-1 flex-row items-center">
+                <View className="w-2 h-2 bg-white rounded-full mr-1" />
+                <Text className="text-white text-xs font-bold">
+                  LIVE
+                </Text>
+              </View>
+            )}
+            
+            {/* Duration if not live */}
+            {!item.isLive && item.duration && (
+              <View className="bg-black/60 rounded-full px-3 py-1">
+                <Text className="text-white text-xs font-medium">
+                  {item.duration}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Bottom content */}
+          <View className="absolute bottom-0 left-0 right-0 p-4">
+            <Text className="text-white text-lg font-bold mb-1 drop-shadow-lg" numberOfLines={2}>
+              {item.title}
+            </Text>
+            {item.channelName && (
+              <View className="flex-row items-center mt-1">
+                <View className="w-6 h-6 bg-gray-300 rounded-full mr-2" />
+                <Text className="text-white/80 text-xs">
+                  {item.channelName}
+                </Text>
+              </View>
+            )}
+          </View>
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -58,12 +103,13 @@ const LiveStreamScrollView: React.FC<HorizontalCardListProps> = ({ data }) => {
     <FlatList
       data={data}
       renderItem={renderCard}
-      keyExtractor={(item) => item.id}
+      keyExtractor={item => item.id}
       horizontal
       showsHorizontalScrollIndicator={false}
-      snapToInterval={CARD_WIDTH + 8} // 8 is the sum of the horizontal margins (mx-1 = 4 points on each side)
+      snapToInterval={CARD_WIDTH + 8} // 8 is the sum of horizontal margins
       decelerationRate="fast"
       className="px-2 py-5"
+      contentContainerStyle={{ paddingEnd: 10 }}
     />
   );
 };

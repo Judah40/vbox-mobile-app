@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { View, Text, Image } from 'react-native';
 import React from 'react';
 import Spinner from 'react-native-loading-spinner-overlay';

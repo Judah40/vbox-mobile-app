@@ -6,6 +6,7 @@ import cardItems from '~/utils/DummyData/LiveDummyData';
 import { handleGetAllPostsByGenre } from '~/app/api/videos/api';
 import EntertainmentApp from '~/components/HomePageComponents/VideosOnDemand';
 import HomeMainCard from '~/components/HomePageComponents/HomeMainCard';
+import UpcomingStreamCard from '~/components/HomePageComponents/UpcomingStreamCard';
 
 type Data = {
   [tag: string]: Array<{
@@ -54,8 +55,8 @@ const Index = () => {
 
       {/*UPCOMING LIVE STREAM */}
       <View className="p-4">
-        <View className="h-40 w-full items-center justify-center rounded-lg border border-yellow-500">
-          <Text className="text-xl text-white">Upcoming Stream</Text>
+        <View className=" w-full  rounded-lg border border-yellow-500">
+          <UpcomingStreamCard />
         </View>
       </View>
 

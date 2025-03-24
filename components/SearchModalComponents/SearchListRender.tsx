@@ -15,7 +15,7 @@ export interface MediaItem {
 
 interface SearchListRenderProps {
   data: MediaItem[];
-  onCardPress?: (item: MediaItem) => void;
+  onCardPress?: (item: number) => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -25,7 +25,7 @@ const SearchListRender: React.FC<SearchListRenderProps> = ({ data, onCardPress }
   const renderCard = ({ item }: { item: MediaItem }) => {
     return (
       <TouchableOpacity
-        onPress={() => onCardPress && onCardPress(item)}
+        onPress={() => onCardPress && onCardPress(item.id)}
         activeOpacity={0.9}
         className="w-full">
         <View className="mx-4 my-3 overflow-hidden rounded-2xl bg-gray-800 shadow">

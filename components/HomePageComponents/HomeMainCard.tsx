@@ -1,10 +1,11 @@
-import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
-import Carousel from 'react-native-reanimated-carousel';
-import { handleGetPostByGenre } from '~/app/api/videos/api';
-import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import Carousel from 'react-native-reanimated-carousel';
+
+import { handleGetPostByGenre } from '~/app/api/videos/api';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -23,73 +24,70 @@ export interface PostItem {
   category?: string;
 }
 
-const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
+const PostCarousel = ({ onPostPress, genre = 'Music' }: any) => {
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   // Enhanced carousel item with beautiful styling
-  const CarouselItem = ({ item, index, animationValue }) => {
+  const CarouselItem = ({ item, index, animationValue }: any) => {
     const animatedStyle = useAnimatedStyle(() => {
       const scale = interpolate(
         animationValue.value,
         [(index - 1) * screenWidth, index * screenWidth, (index + 1) * screenWidth],
         [0.9, 1, 0.9]
       );
-      
+
       return {
-        transform: [{ scale }]
+        transform: [{ scale }],
       };
     });
-    
+
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => onPostPress?.(item)}
-        style={styles.itemContainer}
-      >
+        style={styles.itemContainer}>
         <Animated.View style={[styles.animatedCard, animatedStyle]}>
-          <Image 
-            source={{ uri: item.bannerUrl }} 
-            style={styles.bannerImage}
-          />
-          
+          <Image source={{ uri: item.bannerUrl }} style={styles.bannerImage} />
+
           {/* Gradient overlay for better text visibility */}
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
-            style={styles.gradient}
-          >
+            style={styles.gradient}>
             {/* Category tag */}
             <View style={styles.categoryContainer}>
               <View style={styles.categoryTag}>
                 <Text style={styles.categoryText}>{item.category || 'FEATURED'}</Text>
               </View>
             </View>
-            
+
             {/* Content overlay */}
             <View style={styles.contentContainer}>
               {/* Creator info */}
               <View style={styles.creatorRow}>
-                <Image 
-                  source={{ uri: `https://randomuser.me/api/portraits/${index % 2 ? 'men' : 'women'}/${(index % 10) + 1}.jpg` }} 
-                  style={styles.creatorAvatar} 
+                <Image
+                  source={{
+                    uri: `https://randomuser.me/api/portraits/${index % 2 ? 'men' : 'women'}/${(index % 10) + 1}.jpg`,
+                  }}
+                  style={styles.creatorAvatar}
                 />
                 <View style={styles.creatorInfo}>
                   <Text style={styles.creatorName}>{item.creator || 'Content Creator'}</Text>
                   <Text style={styles.timestamp}>{item.timestamp || '2 hours ago'}</Text>
                 </View>
               </View>
-              
+
               {/* Caption */}
               <Text style={styles.caption}>{item.caption}</Text>
-              
+
               {/* Details row */}
               <View style={styles.detailsRow}>
                 <View style={styles.detailItem}>
                   <FontAwesome5 name="map-marker-alt" size={12} color="white" />
                   <Text style={styles.detailText}>{item.location}</Text>
                 </View>
-                
+
                 <View style={styles.detailItem}>
                   <FontAwesome5 name="heart" size={12} color="white" />
                   <Text style={styles.detailText}>{item.likes || '2.4k'}</Text>
@@ -97,7 +95,7 @@ const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
               </View>
             </View>
           </LinearGradient>
-          
+
           {/* Post number badge */}
           <View style={styles.numberBadge}>
             <Text style={styles.numberText}>{index + 1}</Text>
@@ -106,17 +104,17 @@ const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
       </TouchableOpacity>
     );
   };
-  
+
   // Pagination indicators
   const Pagination = () => {
     return (
       <View style={styles.paginationContainer}>
         {posts.map((_, index) => (
-          <View 
+          <View
             key={index}
             style={[
               styles.paginationDot,
-              activeIndex === index ? styles.activeDot : styles.inactiveDot
+              activeIndex === index ? styles.activeDot : styles.inactiveDot,
             ]}
           />
         ))}
@@ -145,21 +143,25 @@ const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
         setIsLoading(false);
       });
   }, [genre]);
-  
+
   // Helper functions for realistic data
   const getRandomCreator = () => {
     const creators = [
-      'James Arthur', 'Emma Wilson', 'Michael Scott', 
-      'Sarah Johnson', 'Robert Chen', 'Alex Morgan'
+      'James Arthur',
+      'Emma Wilson',
+      'Michael Scott',
+      'Sarah Johnson',
+      'Robert Chen',
+      'Alex Morgan',
     ];
     return creators[Math.floor(Math.random() * creators.length)];
   };
-  
+
   const getRandomTimestamp = () => {
     const times = ['Just now', '2 min ago', '15 min ago', '1 hour ago', '3 hours ago', 'Yesterday'];
     return times[Math.floor(Math.random() * times.length)];
   };
-  
+
   const getRandomCategory = () => {
     const categories = ['TRENDING', 'POPULAR', 'FEATURED', 'NEW', 'RECOMMENDED'];
     return categories[Math.floor(Math.random() * categories.length)];
@@ -185,7 +187,7 @@ const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
           <Text style={styles.viewAllText}>View All</Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Carousel container */}
       <View style={styles.carouselContainer}>
         <Carousel
@@ -206,7 +208,7 @@ const PostCarousel = ({ onPostPress, genre = 'Music' }) => {
           }}
         />
       </View>
-      
+
       {/* Pagination dots */}
       <Pagination />
     </View>
@@ -383,7 +385,7 @@ const styles = StyleSheet.create({
   inactiveDot: {
     width: 8,
     backgroundColor: '#bdbdbd',
-  }
+  },
 });
 
 export default PostCarousel;

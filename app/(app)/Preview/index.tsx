@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -12,7 +13,10 @@ import {
   Platform,
   Pressable,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import {
+  HeartIcon as HeartOutline,
+  BookmarkIcon as BookmarkOutline,
+} from 'react-native-heroicons/outline';
 import {
   PlayIcon,
   HeartIcon,
@@ -26,16 +30,12 @@ import {
   FireIcon,
   ChevronDownIcon,
 } from 'react-native-heroicons/solid';
-import {
-  HeartIcon as HeartOutline,
-  BookmarkIcon as BookmarkOutline,
-} from 'react-native-heroicons/outline';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 const BANNER_HEIGHT = height * 0.65;
 
-const ImmersiveVideoPreview = ({ video, onClose }) => {
+const ImmersiveVideoPreview = ({ video, onClose }: any) => {
   const [savedToList, setSavedToList] = useState(false);
   const [liked, setLiked] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -154,7 +154,7 @@ const ImmersiveVideoPreview = ({ video, onClose }) => {
     },
   ];
 
-  const renderRelatedItem = ({ item }) => (
+  const renderRelatedItem = ({ item }: any) => (
     <TouchableOpacity className="mr-4 w-56 overflow-hidden rounded-lg" activeOpacity={0.9}>
       <View className="relative">
         <Image
@@ -184,7 +184,7 @@ const ImmersiveVideoPreview = ({ video, onClose }) => {
   );
 
   // Animation helper for content reveal
-  const AnimatedContent = ({ delay = 0, children, className }) => {
+  const AnimatedContent = ({ delay = 0, children, className }: any) => {
     const [visible, setVisible] = useState(!delay);
 
     useEffect(() => {
@@ -277,7 +277,7 @@ const ImmersiveVideoPreview = ({ video, onClose }) => {
 
           {/* Play Button */}
           <Animated.View
-            className="absolute inset-0 items-center justify-center mt-20"
+            className="absolute inset-0 mt-20 items-center justify-center"
             style={{ transform: [{ scale: animatedValues.scale }] }}>
             <TouchableOpacity
               className="items-center justify-center rounded-full bg-red-600 p-5"

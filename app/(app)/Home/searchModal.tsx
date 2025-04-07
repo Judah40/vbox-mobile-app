@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
+
 import { handleGetAllPosts } from '~/app/api/videos/api';
 import SearchBar from '~/components/HomePageComponents/SearchBar';
 import SearchListRender from '~/components/SearchModalComponents/SearchListRender';

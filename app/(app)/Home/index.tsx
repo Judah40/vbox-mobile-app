@@ -1,15 +1,16 @@
-import { View, Text, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import CategoryScrollBar from '~/components/HomePageComponents/CategoryScrollBar';
-import LiveStreamScrollView from '~/components/HomePageComponents/LiveStreamScrollView';
-import cardItems from '~/utils/DummyData/LiveDummyData';
+import { View, Text, ScrollView } from 'react-native';
+
 import { handleGetAllPostsByGenre } from '~/app/api/videos/api';
-import EntertainmentApp from '~/components/HomePageComponents/VideosOnDemand';
+import CategoryScrollBar from '~/components/HomePageComponents/CategoryScrollBar';
 import HomeMainCard from '~/components/HomePageComponents/HomeMainCard';
+import LiveStreamScrollView from '~/components/HomePageComponents/LiveStreamScrollView';
 import UpcomingStreamCard from '~/components/HomePageComponents/UpcomingStreamCard';
+import EntertainmentApp from '~/components/HomePageComponents/VideosOnDemand';
+import cardItems from '~/utils/DummyData/LiveDummyData';
 
 type Data = {
-  [tag: string]: Array<{
+  [tag: string]: {
     id: number;
     postId: string;
     content: string;
@@ -19,7 +20,7 @@ type Data = {
     likeCount: number;
     commentCount: number;
     location: string;
-  }>;
+  }[];
 };
 
 const Index = () => {

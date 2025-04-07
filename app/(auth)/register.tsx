@@ -1,4 +1,6 @@
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import React, { useCallback, useRef } from 'react';
 import {
@@ -12,10 +14,9 @@ import {
   Pressable,
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import CustomTextInput from '~/components/CustomTextInput';
 import * as Yup from 'yup';
-import { useRouter } from 'expo-router';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+
+import CustomTextInput from '~/components/CustomTextInput';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -101,7 +102,7 @@ const Register = () => {
                   <View className="py-4">
                     <Pressable
                       style={{ backgroundColor: 'rgb(184, 134, 11)', borderRadius: 10 }}
-                      onPress={handleSubmit}
+                      onPress={() => handleSubmit}
                       className="w-11/12 items-center justify-center rounded-lg p-4">
                       <Text className="text-white">Register</Text>
                     </Pressable>
@@ -128,8 +129,10 @@ const Register = () => {
         ref={bottomSheetModalRef}
         enableDismissOnClose={false} // Prevents closing the modal
         onChange={handleSheetChanges}>
-        <View className="flex-1 bg-gray-900"></View>
-        <BottomSheetView></BottomSheetView>
+        <View className="flex-1 bg-gray-900" />
+        <BottomSheetView>
+          <Text>Hello</Text>
+        </BottomSheetView>
       </BottomSheetModal>
     </KeyboardAvoidingView>
   );

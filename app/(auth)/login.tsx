@@ -62,14 +62,14 @@ const Login = () => {
                       />
 
                       <View style={{ alignItems: 'flex-end' }}>
-                        <Pressable onPress={handleSubmit}>
+                        <Pressable onPress={() => handleSubmit}>
                           <Text className="text-white underline">Forgot Password?</Text>
                         </Pressable>
                       </View>
                       <View className="py-4">
                         <Pressable
                           style={{ backgroundColor: 'rgb(184, 134, 11)', borderRadius: 10 }}
-                          onPress={handleSubmit}
+                          onPress={() => handleSubmit}
                           className="w-11/12 items-center justify-center rounded-lg p-4">
                           <Text className="text-white">Sign In</Text>
                         </Pressable>

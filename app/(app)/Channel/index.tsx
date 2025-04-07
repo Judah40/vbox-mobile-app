@@ -1,6 +1,6 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 
 // Sample data for always-live channels
 const LIVE_CHANNELS = [
@@ -72,7 +72,7 @@ const LIVE_CHANNELS = [
   },
 ];
 
-const formatNumber = (num) => {
+const formatNumber = (num: number) => {
   if (num >= 1000000) {
     return `${(num / 1000000).toFixed(1)}M`;
   }
@@ -83,7 +83,7 @@ const formatNumber = (num) => {
 };
 
 const LiveChannelsList = () => {
-  const renderChannelItem = ({ item }) => (
+  const renderChannelItem = ({ item }: any) => (
     <TouchableOpacity className="mb-6 overflow-hidden rounded-xl bg-gray-800 shadow-lg">
       {/* Cover Image */}
       <View className="relative">

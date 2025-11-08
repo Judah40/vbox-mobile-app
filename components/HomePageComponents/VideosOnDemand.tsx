@@ -484,6 +484,7 @@ const EntertainmentApp: React.FC<EntertainmentAppProps> = ({ data, isLoading = f
         ListHeaderComponent={<FeaturedBanner />}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 16 }}
+        scrollEnabled={false}
       />
     </View>
   );

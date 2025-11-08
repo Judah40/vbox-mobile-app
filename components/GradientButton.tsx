@@ -23,6 +23,7 @@ const GradientButton: React.FC<GradientButtonProps> = ({
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.98 : 1 }],
         opacity: disabled ? 0.6 : 1,
+        marginTop: 10,
       })}>
       <LinearGradient
         colors={disabled ? ['#374151', '#374151'] : colors}

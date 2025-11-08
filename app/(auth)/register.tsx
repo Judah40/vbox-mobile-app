@@ -2,7 +2,7 @@ import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -18,8 +18,6 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import * as Yup from 'yup';
 import CustomSelectInput from '~/components/CustomSelectInput';
 import DatePickerModal from '~/components/DatePickerModal';
 import GradientButton from '~/components/GradientButton';
@@ -38,17 +36,18 @@ const initialValues = {
   address: '',
   phoneNumber: '',
   username: '',
+  password: '',
+  confirmPassword: '',
 };
 
 const Register = () => {
   const router = useRouter();
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { onRegister } = useAuth();
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
@@ -66,11 +65,7 @@ const Register = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}>
-      <LinearGradient
-        colors={['#0f172a', '#1e293b', '#0f172a']}
-        style={{ flex: 1 }}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}>
+      <View className="bg-black">
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
@@ -79,7 +74,7 @@ const Register = () => {
           }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <Pressable onPress={Keyboard.dismiss}>
             <Animated.View
               style={{
                 opacity: fadeAnim,
@@ -183,6 +178,22 @@ const Register = () => {
                           keyboardType="email-address"
                         />
                         <CustomTextInput
+                          label="Password"
+                          value={values.password}
+                          onChangeText={handleChange('password')}
+                          onBlur={handleBlur('password')}
+                          error={touched.password ? errors.password : undefined}
+                          isPassword
+                        />
+                        <CustomTextInput
+                          label="Confirm Password"
+                          value={values.confirmPassword}
+                          onChangeText={handleChange('confirmPassword')}
+                          onBlur={handleBlur('confirmPassword')}
+                          error={touched.confirmPassword ? errors.confirmPassword : undefined}
+                          isPassword
+                        />
+                        <CustomTextInput
                           label="Address"
                           value={values.address}
                           onChangeText={handleChange('address')}
@@ -256,14 +267,14 @@ const Register = () => {
                       <DatePickerModal
                         visible={showDatePicker}
                         onClose={() => setShowDatePicker(false)}
-                        onSelect={(date) => setFieldValue('dateOfBirth', date)}
+                        onSelect={(date: string) => setFieldValue('dateOfBirth', date)}
                       />
 
                       <PickerModal
                         visible={showGenderPicker}
                         onClose={() => setShowGenderPicker(false)}
                         options={genderOptions}
-                        onSelect={(gender) => setFieldValue('gender', gender)}
+                        onSelect={(gender: string) => setFieldValue('gender', gender)}
                         title="Select Gender"
                       />
                     </View>
@@ -271,9 +282,9 @@ const Register = () => {
                 }}
               </Formik>
             </Animated.View>
-          </TouchableWithoutFeedback>
+          </Pressable>
         </ScrollView>
-      </LinearGradient>
+      </View>
     </KeyboardAvoidingView>
   );
 };

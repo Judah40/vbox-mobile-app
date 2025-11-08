@@ -351,7 +351,6 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                 {/* Chat Container */}
                 <View className="flex-1 bg-zinc-950">
                   <OverlayProvider
-                    bottomInset={0}
                     value={{
                       style: {
                         messageList: {
@@ -387,27 +386,17 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                               marginLeft: 0,
                               marginRight: 0,
                             },
-                            text: {
-                              color: '#e4e4e7',
-                              fontSize: 14,
-                              lineHeight: 20,
-                            },
                             metaContainer: {
                               marginTop: 4,
                             },
                             metaText: {
-                              color: '#71717a',
+                              color: 'white',
                               fontSize: 12,
                             },
                           },
                           avatarWrapper: {
                             container: {
                               marginRight: 12,
-                            },
-                            avatar: {
-                              width: 32,
-                              height: 32,
-                              borderRadius: 16,
                             },
                           },
                         },
@@ -444,6 +433,11 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                                   </Text>
                                 </View>
                               )}
+                              EmptyStateIndicator={() => (
+                                <View className="h-full w-full items-center justify-center bg-black">
+                                  <Text className="text-white">No Comments Available</Text>
+                                </View>
+                              )}
                             />
                           </View>
 
@@ -471,7 +465,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                                   fontWeight: '400',
                                 },
                               }}
-                              sendButton={() => (
+                              SendButton={() => (
                                 <TouchableOpacity
                                   className="ml-2 items-center justify-center rounded-full bg-blue-600 px-6 py-3"
                                   style={{

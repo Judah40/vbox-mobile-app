@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Modal, Pressable, ScrollView, View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -49,117 +50,124 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({ visible, onClose, onS
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable
-        style={{
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          justifyContent: 'flex-end',
-        }}
-        onPress={onClose}>
+      <View style={{ flex: 1 }}>
+        {/* Backdrop */}
         <Pressable
           style={{
-            backgroundColor: '#1e293b',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
           }}
-          onPress={(e) => e.stopPropagation()}>
-          <View className="border-b border-gray-700 p-4">
-            <Text className="text-center text-xl font-bold text-white">Select Date of Birth</Text>
-          </View>
-          <View className="flex-row gap-2 p-4">
-            <View className="flex-1">
-              <Text className="mb-2 text-center text-xs text-gray-400">Month</Text>
-              <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
-                {months.map((month, index) => (
-                  <Pressable
-                    key={index}
-                    onPress={() => setSelectedMonth(month)}
-                    style={{
-                      padding: 12,
-                      backgroundColor: selectedMonth === month ? '#d4af37' : '#0f172a',
-                      marginBottom: 4,
-                      borderRadius: 8,
-                    }}>
-                    <Text
-                      className="text-center"
-                      style={{ color: selectedMonth === month ? '#000' : '#fff' }}>
-                      {month.slice(0, 3)}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
+          onPress={onClose}
+        />
+
+        {/* Modal Content with SafeAreaView */}
+        <SafeAreaView edges={['bottom']} style={{ backgroundColor: '#1e293b' }}>
+          <View
+            style={{
+              backgroundColor: '#1e293b',
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+            onStartShouldSetResponder={() => true}>
+            <View className="border-b border-gray-700 p-4">
+              <Text className="text-center text-xl font-bold text-white">Select Date of Birth</Text>
             </View>
-            <View className="flex-1">
-              <Text className="mb-2 text-center text-xs text-gray-400">Day</Text>
-              <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
-                {days.map((day) => (
-                  <Pressable
-                    key={day}
-                    onPress={() => setSelectedDay(day)}
-                    style={{
-                      padding: 12,
-                      backgroundColor: selectedDay === day ? '#d4af37' : '#0f172a',
-                      marginBottom: 4,
-                      borderRadius: 8,
-                    }}>
-                    <Text
-                      className="text-center"
-                      style={{ color: selectedDay === day ? '#000' : '#fff' }}>
-                      {day}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
+            {/* ... rest of the content remains the same */}
+            <View className="flex-row gap-2 p-4">
+              <View className="flex-1">
+                <Text className="mb-2 text-center text-xs text-gray-400">Month</Text>
+                <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
+                  {months.map((month, index) => (
+                    <Pressable
+                      key={index}
+                      onPress={() => setSelectedMonth(month)}
+                      style={{
+                        padding: 12,
+                        backgroundColor: selectedMonth === month ? '#d4af37' : '#0f172a',
+                        marginBottom: 4,
+                        borderRadius: 8,
+                      }}>
+                      <Text
+                        className="text-center"
+                        style={{ color: selectedMonth === month ? '#000' : '#fff' }}>
+                        {month.slice(0, 3)}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+              <View className="flex-1">
+                <Text className="mb-2 text-center text-xs text-gray-400">Day</Text>
+                <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
+                  {days.map((day) => (
+                    <Pressable
+                      key={day}
+                      onPress={() => setSelectedDay(day)}
+                      style={{
+                        padding: 12,
+                        backgroundColor: selectedDay === day ? '#d4af37' : '#0f172a',
+                        marginBottom: 4,
+                        borderRadius: 8,
+                      }}>
+                      <Text
+                        className="text-center"
+                        style={{ color: selectedDay === day ? '#000' : '#fff' }}>
+                        {day}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+              <View className="flex-1">
+                <Text className="mb-2 text-center text-xs text-gray-400">Year</Text>
+                <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
+                  {years.map((year) => (
+                    <Pressable
+                      key={year}
+                      onPress={() => setSelectedYear(year)}
+                      style={{
+                        padding: 12,
+                        backgroundColor: selectedYear === year ? '#d4af37' : '#0f172a',
+                        marginBottom: 4,
+                        borderRadius: 8,
+                      }}>
+                      <Text
+                        className="text-center"
+                        style={{ color: selectedYear === year ? '#000' : '#fff' }}>
+                        {year}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
             </View>
-            <View className="flex-1">
-              <Text className="mb-2 text-center text-xs text-gray-400">Year</Text>
-              <ScrollView style={{ height: 150 }} showsVerticalScrollIndicator={false}>
-                {years.map((year) => (
-                  <Pressable
-                    key={year}
-                    onPress={() => setSelectedYear(year)}
-                    style={{
-                      padding: 12,
-                      backgroundColor: selectedYear === year ? '#d4af37' : '#0f172a',
-                      marginBottom: 4,
-                      borderRadius: 8,
-                    }}>
-                    <Text
-                      className="text-center"
-                      style={{ color: selectedYear === year ? '#000' : '#fff' }}>
-                      {year}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
+            <View className="gap-2 p-4">
+              <Pressable
+                onPress={handleConfirm}
+                disabled={!selectedDay || !selectedMonth || !selectedYear}
+                style={{
+                  backgroundColor:
+                    selectedDay && selectedMonth && selectedYear ? '#d4af37' : '#374151',
+                  padding: 16,
+                  borderRadius: 12,
+                }}>
+                <Text className="text-center text-lg font-bold" style={{ color: '#fff' }}>
+                  Confirm
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={onClose}
+                style={{
+                  backgroundColor: '#374151',
+                  padding: 16,
+                  borderRadius: 12,
+                }}>
+                <Text className="text-center text-gray-300">Cancel</Text>
+              </Pressable>
             </View>
           </View>
-          <View className="gap-2 p-4">
-            <Pressable
-              onPress={handleConfirm}
-              disabled={!selectedDay || !selectedMonth || !selectedYear}
-              style={{
-                backgroundColor:
-                  selectedDay && selectedMonth && selectedYear ? '#d4af37' : '#374151',
-                padding: 16,
-                borderRadius: 12,
-              }}>
-              <Text className="text-center text-lg font-bold" style={{ color: '#fff' }}>
-                Confirm
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={onClose}
-              style={{
-                backgroundColor: '#374151',
-                padding: 16,
-                borderRadius: 12,
-              }}>
-              <Text className="text-center text-gray-300">Cancel</Text>
-            </Pressable>
-          </View>
-        </Pressable>
-      </Pressable>
+        </SafeAreaView>
+      </View>
     </Modal>
   );
 };

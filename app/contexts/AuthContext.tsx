@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
 
 import auth, { getUserProfile, getUserProfilePicture } from '../api/auth';
 import { router } from 'expo-router';
@@ -17,7 +15,7 @@ type userProps = {
   email: string;
   address: string;
   phoneNumber: string;
-  id: string;
+  id?: string;
 };
 type userLoginProps = {
   email: string;
@@ -114,9 +112,14 @@ HANDLE GET USER DETAILS
   */
   const handleUserRegistration = async (userRegistrationCredentials: userProps) => {
     const response = await auth.handleUserRegistration(userRegistrationCredentials);
-    console.log(response);
+    console.log(response.data);
     if (response.data) {
-      router.push('/(auth)/otpInput');
+      router.push({
+        pathname: '/(auth)/otpInput',
+        params: {
+          otp: response.data.otp,
+        },
+      });
     }
   };
 
@@ -124,10 +127,11 @@ HANDLE GET USER DETAILS
 HANDLE USER LOGOUT
 */
   const handleUserLogout = async () => {
-    const token = await SecureStore.deleteItemAsync('token');
+    await AsyncStorage.multiRemove(['token', 'streamToken']);
     setAuthState({
       authenticated: false,
     });
+    router.replace('/(auth)/login');
   };
 
   const value = {

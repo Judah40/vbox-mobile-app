@@ -1,7 +1,16 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, TextInput, Switch } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  Switch,
+  Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '~/app/contexts/AuthContext';
 // import { string } from 'yup';
@@ -16,20 +25,51 @@ const UserProfile = () => {
 
   // Menu items to display
   const menuItems = [
-    { icon: 'bookmark', label: 'Saved Videos', action: () => router.push('/(app)/Account/Saved') },
-    { icon: 'clock', label: 'Watch History', action: () => router.push('/(app)/Account/Watch') },
-    { icon: 'heart', label: 'Liked Videos', action: () => router.push('/(app)/Account/Liked') },
+    {
+      icon: 'bookmark',
+      label: 'Saved Videos',
+      action: () => {
+        // router.push('/(app)/Account/Saved')
+        Alert.alert('Coming soon');
+      },
+    },
+    {
+      icon: 'clock',
+      label: 'Watch History',
+      action: () => {
+        // router.push('/(app)/Account/Watch')
+        Alert.alert('Coming soon');
+      },
+    },
+    {
+      icon: 'heart',
+      label: 'Liked Videos',
+      action: () => {
+        // router.push('/(app)/Account/Liked')
+        Alert.alert('Coming soon');
+      },
+    },
     {
       icon: 'bell',
       label: 'Notification Settings',
-      action: () => router.push('/(app)/Account/Notification'),
+      action: () => {
+        // router.push('/(app)/Account/Notification')
+        Alert.alert('Coming soon');
+      },
     },
     {
       icon: 'shield',
-      label: 'Privacy Settings',
+      label: 'Password',
       action: () => router.push('/(app)/Account/Privacy'),
     },
-    { icon: 'help-circle', label: 'Help & Support', action: () => console.log('Help') },
+    {
+      icon: 'help-circle',
+      label: 'Help & Support',
+      action: () => {
+        // console.log('Help')
+        Alert.alert('Coming soon');
+      },
+    },
     {
       icon: 'log-out',
       label: 'Sign Out',
@@ -50,7 +90,7 @@ const UserProfile = () => {
         {/* Cover Image & Avatar */}
         <View className="relative">
           <Image
-            source={{ uri: userProfilePicture ? userProfilePicture : null }}
+            source={userProfilePicture ? { uri: userProfilePicture } : undefined}
             className="z-30 h-48 w-full"
             resizeMode="cover"
           />
@@ -58,11 +98,15 @@ const UserProfile = () => {
 
           <View className="absolute -bottom-16 left-4 rounded-full border-4 border-gray-900">
             <Image
-              source={{ uri: userProfilePicture ? userProfilePicture : null }}
+              source={userProfilePicture ? { uri: userProfilePicture } : undefined}
               className="z-40 h-32 w-32 rounded-full"
             />
           </View>
-          <TouchableOpacity className=" absolute right-5 top-5 z-50 h-8 w-36 flex-row items-center justify-center gap-2 rounded bg-yellow-500">
+          <TouchableOpacity
+            onPress={() => {
+              router.push('/(app)/Account/Profile');
+            }}
+            className=" absolute right-5 top-5 z-50 h-8 w-36 flex-row items-center justify-center gap-2 rounded bg-yellow-500">
             <Feather name="pen-tool" />
             <Text className="font-bold">Edit Profile</Text>
           </TouchableOpacity>

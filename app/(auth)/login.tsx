@@ -61,6 +61,7 @@ const Login = () => {
                         onChangeText={handleChange('email')}
                         onBlur={handleBlur('email')}
                         error={errors.email}
+                        placeholder="Enter Email"
                       />
                       <CustomTextInput
                         label="Password"
@@ -70,6 +71,7 @@ const Login = () => {
                         error={errors.password}
                         secureTextEntry
                         isPassword
+                        placeholder="Enter Password"
                       />
 
                       <View style={{ alignItems: 'flex-end' }}>

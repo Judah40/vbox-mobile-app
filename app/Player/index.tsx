@@ -1,8 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import MasterVideoPlayer from '~/components/MasterVideoPlayer';
 import { handleGetSinglePost } from '../api/videos/api';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Post {
   bannerUrl: string;
@@ -28,7 +29,7 @@ const Player = () => {
   const [data, setData] = useState<Post>();
   useEffect(() => {
     console.log(url);
-    handleGetSinglePost(Number(url)).then((response) => {
+    handleGetSinglePost(String(url)).then((response) => {
       console.log(response.data.post);
       setData(response.data.post);
     });
@@ -41,15 +42,9 @@ const Player = () => {
             router.back();
           }}
           source={{
-            uri: data?.videoUrl,
+            uri: data?.videoUrl!,
           }}
           title={data?.caption}
-          autoPlay={true}
-          subtitles={[
-            { language: 'English', uri: 'https://example.com/subtitles/en.vtt' },
-            { language: 'Spanish', uri: 'https://example.com/subtitles/es.vtt' },
-          ]}
-          onComplete={() => console.log('Video playback completed')}
         />
       </View>
     </SafeAreaView>

@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,10 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import CustomTextInput from '~/components/CustomTextInput';
+import CustomTextInput from '~/components/CustomTextInputModified';
+import GradientButton from '~/components/GradientButton';
 import loginValidationSchema from '~/utils/ValidationSchema/userLoginValidationSchema';
+import { useAuth } from '../contexts/AuthContext';
 
 const initialValues = {
   email: '',
@@ -23,6 +24,8 @@ const initialValues = {
 };
 const screenWidth = Dimensions.get('window').width;
 const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { onLogin } = useAuth();
   const router = useRouter();
   return (
     <KeyboardAvoidingView
@@ -32,13 +35,22 @@ const Login = () => {
         source={require('../../assets/backgrounds/Arya-Star.jpg')}
         className="flex-1 bg-gray-900">
         <LinearGradient colors={['rgba(0,0,0,1)', 'transparent']} className="flex-1  items-center">
-          <Image source={require('../../assets/vbox.png')} style={{ width: 80, height: 80 }} />
-
           <View className="w-11/12 flex-1 items-center justify-center">
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <Image source={require('../../assets/vbox.png')} style={{ width: 80, height: 80 }} />
+            <Pressable onPress={Keyboard.dismiss}>
               <Formik
                 initialValues={initialValues}
-                onSubmit={(values) => {}}
+                onSubmit={(values) => {
+                  setIsLoading(true);
+                  try {
+                    if (onLogin) onLogin(values);
+                    // console.log(values);
+                  } catch (error) {
+                    console.error(error);
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
                 validationSchema={loginValidationSchema}>
                 {({ errors, handleBlur, handleChange, handleSubmit, values }) => {
                   return (
@@ -50,7 +62,6 @@ const Login = () => {
                         onBlur={handleBlur('email')}
                         error={errors.email}
                       />
-
                       <CustomTextInput
                         label="Password"
                         value={values.password}
@@ -62,17 +73,16 @@ const Login = () => {
                       />
 
                       <View style={{ alignItems: 'flex-end' }}>
-                        <Pressable onPress={() => handleSubmit}>
+                        <Pressable onPress={() => {}}>
                           <Text className="text-white underline">Forgot Password?</Text>
                         </Pressable>
                       </View>
                       <View className="py-4">
-                        <Pressable
-                          style={{ backgroundColor: 'rgb(184, 134, 11)', borderRadius: 10 }}
-                          onPress={() => handleSubmit}
-                          className="w-11/12 items-center justify-center rounded-lg p-4">
-                          <Text className="text-white">Sign In</Text>
-                        </Pressable>
+                        <GradientButton
+                          title="Sign In"
+                          onPress={() => handleSubmit()}
+                          isLoading={isLoading}
+                        />
                       </View>
                       <View className="flex-row justify-center ">
                         <Text className="text-white">Don't have an account?</Text>
@@ -87,7 +97,7 @@ const Login = () => {
                   );
                 }}
               </Formik>
-            </TouchableWithoutFeedback>
+            </Pressable>
           </View>
         </LinearGradient>
       </ImageBackground>

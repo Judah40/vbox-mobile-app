@@ -8,7 +8,7 @@ export const handleGetAllPosts = async () => {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //GET SINGLE POST
-export const handleGetSinglePost = async (id: number) => {
+export const handleGetSinglePost = async (id: string) => {
   const response = await apiClient.get(`/post/${id}`);
   return response;
 };
@@ -24,5 +24,10 @@ export const handleGetPostByGenre = async (genre: string) => {
 //GET ALL POST BY GENRE
 export const handleGetAllPostsByGenre = async () => {
   const response = await apiClient.get('/post/genre');
+  return response;
+};
+
+export const getAllChannel = async () => {
+  const response = await apiClient.get('/channel');
   return response;
 };

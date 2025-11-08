@@ -35,7 +35,7 @@ type registerUserType = {
 };
 const handleUserRegistration = (userRegistrationData: registerUserType) => {
   try {
-    const response = apiClient.post('auth/register', userRegistrationData);
+    const response = apiClient.post('/auth/register', userRegistrationData);
     return response;
   } catch (error) {
     throw error;
@@ -47,11 +47,28 @@ authenticate user
 */
 const authenticateUser = () => {
   try {
-    const response = apiClient.post('auth/authenticate');
+    const response = apiClient.post('/auth/authenticate');
     return response;
   } catch (error) {
     throw error;
   }
 };
 
+export const getUserProfile = async () => {
+  try {
+    const response = await apiClient.get('/auth/profile');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserProfilePicture = async () => {
+  try {
+    const response = await apiClient.get('/auth/profile-picture');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 export default { handleLoginUser, handleUserRegistration, authenticateUser };

@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import { ActivityIndicator } from 'react-native-paper';
 
 import { handleGetAllPosts } from '~/app/api/videos/api';
 import SearchBar from '~/components/HomePageComponents/SearchBar';
@@ -47,16 +47,7 @@ export default function Modal() {
           <Text className="text-white underline">Cancel</Text>
         </TouchableOpacity>
       </View>
-      {isLoading && (
-        <Spinner
-          color="white"
-          size={20}
-          animation="slide"
-          visible
-          textContent="Please Wait"
-          textStyle={{ color: 'white' }}
-        />
-      )}
+      {isLoading && <ActivityIndicator />}
       <SearchListRender
         data={data}
         onCardPress={(data) => {

@@ -1,391 +1,417 @@
-import { FontAwesome5 } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Animated,
+  StatusBar,
+} from 'react-native';
+import { FC, useState, useEffect, useRef } from 'react';
+import { Link, router } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
-import Carousel from 'react-native-reanimated-carousel';
 
-import { handleGetPostByGenre } from '~/app/api/videos/api';
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const { width: screenWidth } = Dimensions.get('window');
-
-export interface PostItem {
-  id: number;
-  postId: string;
-  userId: number;
-  content: string;
+export type cardProps = {
   thumbnailUrl: string;
   bannerUrl: string;
-  caption: string;
+  duration: string;
   location: string;
-  creator?: string;
-  timestamp?: string;
-  likes?: number;
-  category?: string;
-}
+  likeCount: number;
+  genre: string[];
+  title: string;
+  postId: string;
+};
 
-const PostCarousel = ({ onPostPress, genre = 'Music' }: any) => {
-  const [posts, setPosts] = useState<PostItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  // Enhanced carousel item with beautiful styling
-  const CarouselItem = ({ item, index, animationValue }: any) => {
-    const animatedStyle = useAnimatedStyle(() => {
-      const scale = interpolate(
-        animationValue.value,
-        [(index - 1) * screenWidth, index * screenWidth, (index + 1) * screenWidth],
-        [0.9, 1, 0.9]
-      );
-
-      return {
-        transform: [{ scale }],
-      };
-    });
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => onPostPress?.(item)}
-        style={styles.itemContainer}>
-        <Animated.View style={[styles.animatedCard, animatedStyle]}>
-          <Image source={{ uri: item.bannerUrl }} style={styles.bannerImage} />
-
-          {/* Gradient overlay for better text visibility */}
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']}
-            style={styles.gradient}>
-            {/* Category tag */}
-            <View style={styles.categoryContainer}>
-              <View style={styles.categoryTag}>
-                <Text style={styles.categoryText}>{item.category || 'FEATURED'}</Text>
-              </View>
-            </View>
-
-            {/* Content overlay */}
-            <View style={styles.contentContainer}>
-              {/* Creator info */}
-              <View style={styles.creatorRow}>
-                <Image
-                  source={{
-                    uri: `https://randomuser.me/api/portraits/${index % 2 ? 'men' : 'women'}/${(index % 10) + 1}.jpg`,
-                  }}
-                  style={styles.creatorAvatar}
-                />
-                <View style={styles.creatorInfo}>
-                  <Text style={styles.creatorName}>{item.creator || 'Content Creator'}</Text>
-                  <Text style={styles.timestamp}>{item.timestamp || '2 hours ago'}</Text>
-                </View>
-              </View>
-
-              {/* Caption */}
-              <Text style={styles.caption}>{item.caption}</Text>
-
-              {/* Details row */}
-              <View style={styles.detailsRow}>
-                <View style={styles.detailItem}>
-                  <FontAwesome5 name="map-marker-alt" size={12} color="white" />
-                  <Text style={styles.detailText}>{item.location}</Text>
-                </View>
-
-                <View style={styles.detailItem}>
-                  <FontAwesome5 name="heart" size={12} color="white" />
-                  <Text style={styles.detailText}>{item.likes || '2.4k'}</Text>
-                </View>
-              </View>
-            </View>
-          </LinearGradient>
-
-          {/* Post number badge */}
-          <View style={styles.numberBadge}>
-            <Text style={styles.numberText}>{index + 1}</Text>
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
-    );
-  };
-
-  // Pagination indicators
-  const Pagination = () => {
-    return (
-      <View style={styles.paginationContainer}>
-        {posts.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.paginationDot,
-              activeIndex === index ? styles.activeDot : styles.inactiveDot,
-            ]}
-          />
-        ))}
-      </View>
-    );
-  };
+const SkeletonLoader: FC = () => {
+  const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Data fetching with enhanced post metadata
-    handleGetPostByGenre(genre)
-      .then((response) => {
-        // Enhance the data with additional details
-        const enhancedData = response.data.post.map((item: PostItem, index: number) => ({
-          ...item,
-          creator: item.creator || getRandomCreator(),
-          timestamp: item.timestamp || getRandomTimestamp(),
-          likes: item.likes || Math.floor(Math.random() * 9000) + 500,
-          category: item.category || getRandomCategory(),
-        }));
-        setPosts(enhancedData);
-      })
-      .catch((error) => {
-        console.log(error.response?.data || error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [genre]);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(animatedValue, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animatedValue, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
-  // Helper functions for realistic data
-  const getRandomCreator = () => {
-    const creators = [
-      'James Arthur',
-      'Emma Wilson',
-      'Michael Scott',
-      'Sarah Johnson',
-      'Robert Chen',
-      'Alex Morgan',
-    ];
-    return creators[Math.floor(Math.random() * creators.length)];
-  };
-
-  const getRandomTimestamp = () => {
-    const times = ['Just now', '2 min ago', '15 min ago', '1 hour ago', '3 hours ago', 'Yesterday'];
-    return times[Math.floor(Math.random() * times.length)];
-  };
-
-  const getRandomCategory = () => {
-    const categories = ['TRENDING', 'POPULAR', 'FEATURED', 'NEW', 'RECOMMENDED'];
-    return categories[Math.floor(Math.random() * categories.length)];
-  };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading posts...</Text>
-      </View>
-    );
-  }
+  const opacity = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.7],
+  });
 
   return (
-    <View style={styles.container}>
-      {/* Title section */}
-      <View style={styles.headerContainer}>
-        <View>
-          <Text style={styles.headerTitle}>Trending Posts</Text>
-          <Text style={styles.headerSubtitle}>Discover amazing content</Text>
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.viewAllText}>View All</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Carousel container */}
-      <View style={styles.carouselContainer}>
-        <Carousel
-          data={posts}
-          renderItem={({ item, index, animationValue }) => (
-            <CarouselItem item={item} index={index} animationValue={animationValue} />
-          )}
-          width={screenWidth * 0.9}
-          height={250}
-          loop
-          autoPlay
-          autoPlayInterval={5000}
-          onSnapToItem={(index) => setActiveIndex(index)}
-          mode="parallax"
-          modeConfig={{
-            parallaxScrollingScale: 0.9,
-            parallaxScrollingOffset: 50,
+    <View style={{ height: screenHeight * 0.7, backgroundColor: '#1a1a1a' }}>
+      {/* Header Skeleton */}
+      <View className="flex-row items-center justify-between p-4">
+        <Animated.View
+          style={{
+            width: 45,
+            height: 45,
+            backgroundColor: '#2a2a2a',
+            borderRadius: 8,
+            opacity,
+          }}
+        />
+        <Animated.View
+          style={{
+            width: 44,
+            height: 44,
+            backgroundColor: '#2a2a2a',
+            borderRadius: 25,
+            opacity,
           }}
         />
       </View>
 
-      {/* Pagination dots */}
-      <Pagination />
+      {/* Content Skeleton */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'flex-end',
+          paddingHorizontal: 20,
+          paddingBottom: 30,
+        }}>
+        {/* Genre Pills Skeleton */}
+        <View className="mb-3 flex-row flex-wrap gap-2">
+          {[80, 100, 90].map((width, index) => (
+            <Animated.View
+              key={index}
+              style={{
+                width,
+                height: 28,
+                backgroundColor: '#2a2a2a',
+                borderRadius: 20,
+                opacity,
+              }}
+            />
+          ))}
+        </View>
+
+        {/* Title Skeleton */}
+        <View className="mb-4">
+          <Animated.View
+            style={{
+              width: '90%',
+              height: 38,
+              backgroundColor: '#2a2a2a',
+              borderRadius: 8,
+              marginBottom: 8,
+              opacity,
+            }}
+          />
+          <Animated.View
+            style={{
+              width: '60%',
+              height: 38,
+              backgroundColor: '#2a2a2a',
+              borderRadius: 8,
+              opacity,
+            }}
+          />
+        </View>
+
+        {/* Info Row Skeleton */}
+        <View className="mb-6 flex-row items-center gap-4">
+          {[60, 80, 50].map((width, index) => (
+            <Animated.View
+              key={index}
+              style={{
+                width,
+                height: 20,
+                backgroundColor: '#2a2a2a',
+                borderRadius: 10,
+                opacity,
+              }}
+            />
+          ))}
+        </View>
+
+        {/* Action Buttons Skeleton */}
+        <View className="flex-row gap-3">
+          <Animated.View
+            style={{
+              flex: 1,
+              height: 56,
+              backgroundColor: '#2a2a2a',
+              borderRadius: 12,
+              opacity,
+            }}
+          />
+          <Animated.View
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: '#2a2a2a',
+              borderRadius: 12,
+              opacity,
+            }}
+          />
+          <Animated.View
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: '#2a2a2a',
+              borderRadius: 12,
+              opacity,
+            }}
+          />
+        </View>
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    marginBottom: 24,
-  },
-  loadingContainer: {
-    width: '100%',
-    height: 250,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#757575',
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#212121',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#757575',
-  },
-  viewAllText: {
-    color: '#e53935',
-    fontWeight: '600',
-  },
-  carouselContainer: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 250,
-  },
-  itemContainer: {
-    width: '100%',
-    height: '100%',
-    padding: 5,
-  },
-  animatedCard: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  bannerImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  gradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '70%',
-    justifyContent: 'space-between',
-    padding: 16,
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-  categoryTag: {
-    backgroundColor: '#e53935',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  categoryText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  contentContainer: {
-    justifyContent: 'flex-end',
-  },
-  creatorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  creatorAvatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'white',
-    marginRight: 8,
-  },
-  creatorInfo: {
-    flex: 1,
-  },
-  creatorName: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  timestamp: {
-    color: '#e0e0e0',
-    fontSize: 11,
-  },
-  caption: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-  },
-  detailsRow: {
-    flexDirection: 'row',
-    marginTop: 8,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  detailText: {
-    color: '#e0e0e0',
-    fontSize: 12,
-    marginLeft: 6,
-  },
-  numberBadge: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  numberText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  paginationDot: {
-    height: 2,
-    borderRadius: 1,
-    marginHorizontal: 2,
-  },
-  activeDot: {
-    width: 24,
-    backgroundColor: '#e53935',
-  },
-  inactiveDot: {
-    width: 8,
-    backgroundColor: '#bdbdbd',
-  },
-});
+const HomeMainCard: FC<cardProps> = (props) => {
+  const {
+    thumbnailUrl,
+    bannerUrl,
+    duration = '',
+    location = '',
+    likeCount = 0,
+    genre = [],
+    title = '',
+    postId,
+  } = props;
 
-export default PostCarousel;
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const formatLikes = (count: number) => {
+    if (!count && count !== 0) return '0';
+
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`;
+    }
+    if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}K`;
+    }
+    return count.toString();
+  };
+
+  const backgroundSource = bannerUrl ? { uri: bannerUrl } : null;
+
+  if (!imageLoaded) {
+    return (
+      <>
+        <SkeletonLoader />
+        {backgroundSource && (
+          <Image
+            source={backgroundSource}
+            style={{ width: 0, height: 0 }}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageLoaded(true)}
+          />
+        )}
+      </>
+    );
+  }
+
+  return (
+    <View style={{ height: screenHeight * 0.7 }}>
+      <ImageBackground
+        source={backgroundSource!}
+        style={{ flex: 1, paddingTop: StatusBar.currentHeight }}
+        resizeMode="cover">
+        {/* Top Gradient Overlay */}
+        <LinearGradient
+          colors={['rgba(0,0,0,0.7)', 'transparent']}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 150, zIndex: 1 }}
+        />
+
+        {/* Bottom Gradient Overlay */}
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.9)', '#000000']}
+          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 400, zIndex: 1 }}
+        />
+
+        {/* Header */}
+        <View className="flex-row items-center justify-between p-4" style={{ zIndex: 2 }}>
+          <Image
+            source={require('../../assets/vbox.png')}
+            style={{
+              width: 45,
+              height: 45,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.8,
+              shadowRadius: 4,
+            }}
+          />
+
+          <View className="flex-row gap-2">
+            <Link href={'/(app)/Home/searchModal'} asChild>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  padding: 10,
+                  borderRadius: 25,
+                  backdropFilter: 'blur(10px)',
+                }}>
+                <FontAwesome name="bell" size={22} color="white" />
+              </TouchableOpacity>
+            </Link>
+            <Link href={'/(app)/Home/searchModal'} asChild>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  padding: 10,
+                  borderRadius: 25,
+                  backdropFilter: 'blur(10px)',
+                }}>
+                <FontAwesome name="search" size={22} color="white" />
+              </TouchableOpacity>
+            </Link>
+          </View>
+        </View>
+
+        {/* Content Container */}
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            zIndex: 2,
+            paddingHorizontal: 20,
+            paddingBottom: 30,
+          }}>
+          {/* Genre Pills */}
+          <View className="mb-3 flex-row flex-wrap gap-2">
+            {genre &&
+              genre.map((g, index) =>
+                g ? (
+                  <View
+                    key={index}
+                    style={{
+                      backgroundColor: 'rgba(212, 175, 55, 0.3)',
+                      borderWidth: 1,
+                      borderColor: '#d4af37',
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 20,
+                    }}>
+                    <Text className="text-xs font-semibold text-white">{g}</Text>
+                  </View>
+                ) : null
+              )}
+          </View>
+
+          {/* Title */}
+          <Text
+            className="mb-4 font-bold text-white"
+            style={{
+              fontSize: 32,
+              lineHeight: 38,
+              textShadowColor: 'rgba(0, 0, 0, 0.8)',
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 4,
+              letterSpacing: 0.5,
+            }}>
+            {title || 'Untitled'}
+          </Text>
+
+          {/* Info Row */}
+          <View className="mb-6 flex-row items-center gap-4">
+            {/* Duration */}
+            <View className="flex-row items-center gap-1.5">
+              <FontAwesome name="clock-o" size={16} color="#d4af37" />
+              <Text className="text-sm font-medium text-gray-300">{duration || 'Unknown'}</Text>
+            </View>
+
+            {/* Separator */}
+            <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#d4af37' }} />
+
+            {/* Location */}
+            <View className="flex-row items-center gap-1.5">
+              <FontAwesome name="map-marker" size={16} color="#d4af37" />
+              <Text className="text-sm font-medium text-gray-300">{location || 'Unknown'}</Text>
+            </View>
+
+            {/* Separator */}
+            <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#d4af37' }} />
+
+            {/* Likes */}
+            <View className="flex-row items-center gap-1.5">
+              <FontAwesome name="heart" size={14} color="#d4af37" />
+              <Text className="text-sm font-medium text-gray-300">{formatLikes(likeCount)}</Text>
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className="flex-row gap-3">
+            {/* Play Button */}
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: '/Player',
+                  params: {
+                    url: postId,
+                  },
+                });
+              }}
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#d4af37',
+                paddingVertical: 16,
+                borderRadius: 12,
+                shadowColor: '#d4af37',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.5,
+                shadowRadius: 8,
+                elevation: 6,
+              }}>
+              <FontAwesome name="play" size={18} color="#000" style={{ marginRight: 8 }} />
+              <Text className="text-lg font-bold" style={{ color: '#000' }}>
+                Play Now
+              </Text>
+            </TouchableOpacity>
+
+            {/* Info Button */}
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 20,
+                paddingVertical: 16,
+                borderRadius: 12,
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.3)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <FontAwesome name="info-circle" size={22} color="white" />
+            </TouchableOpacity>
+
+            {/* Add to List Button */}
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 20,
+                paddingVertical: 16,
+                borderRadius: 12,
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.3)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <FontAwesome name="plus" size={22} color="white" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
+    </View>
+  );
+};
+
+export default HomeMainCard;

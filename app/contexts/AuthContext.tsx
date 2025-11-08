@@ -4,7 +4,9 @@ import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
-import auth from '../api/auth';
+import auth, { getUserProfile, getUserProfilePicture } from '../api/auth';
+import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 type userProps = {
   firstName: string;
   middleName: string;
@@ -15,6 +17,7 @@ type userProps = {
   email: string;
   address: string;
   phoneNumber: string;
+  id: string;
 };
 type userLoginProps = {
   email: string;
@@ -24,9 +27,10 @@ interface AuthProps {
   authState: { authenticated: boolean | null };
   userDetails?: userProps | null;
   onRegister: (userProps: userProps) => Promise<void>;
-  onLogin: (userLoginProps:userLoginProps) => Promise<void>;
+  onLogin: (userLoginProps: userLoginProps) => Promise<void>;
   onLogout: () => Promise<any>;
   initialized: boolean;
+  userProfilePicture: string;
 }
 
 const AuthContext = createContext<Partial<AuthProps>>({});
@@ -42,7 +46,7 @@ export const AuthProvider = ({ children }: any) => {
   });
   const [initialized, setInitialized] = useState(false);
   const [userDetails, setUserDetails] = useState<userProps | null>(null);
-
+  const [userProfilePicture, setUserProfilePicture] = useState('');
   /* 
   Auth Checker
   */
@@ -50,28 +54,56 @@ export const AuthProvider = ({ children }: any) => {
     const authenticate = async () => {
       try {
         const response = await auth.authenticateUser();
+        console.log(response.status);
         if (response.status === 200) {
+          router.replace('/(app)/Home');
           setAuthState({ authenticated: true });
         }
       } catch (error) {
-        console.error("Authentication error:", error);
+        console.error('Authentication error:', error);
+        router.replace('/(auth)/login');
       } finally {
         setInitialized(true);
       }
     };
     authenticate();
-  }, []); 
-  
+  }, []);
 
+  /* 
+HANDLE GET USER DETAILS
+*/
+
+  useEffect(() => {
+    getUserProfile()
+      .then((response) => {
+        setUserDetails(response.data.user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    getUserProfilePicture()
+      .then((response) => {
+        setUserProfilePicture(response.data.profilePictureUrl);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
   /* 
   FUNCTION TO HANDLE USER LOGIN
   */
   const handleUserLogin = async (userLoginCredentials: { email: string; password: string }) => {
     const response = await auth.handleLoginUser(userLoginCredentials);
     if (response.data) {
+      await AsyncStorage.setItem('token', response.data.token);
+      await AsyncStorage.setItem('streamToken', response.data.streamToken);
+      console.log(response.data);
+
       setAuthState({
         authenticated: true,
       });
+      router.replace('/(app)/Home');
     } else {
       // Alert.alert()
     }
@@ -82,7 +114,9 @@ export const AuthProvider = ({ children }: any) => {
   */
   const handleUserRegistration = async (userRegistrationCredentials: userProps) => {
     const response = await auth.handleUserRegistration(userRegistrationCredentials);
+    console.log(response);
     if (response.data) {
+      router.push('/(auth)/otpInput');
     }
   };
 
@@ -103,6 +137,7 @@ HANDLE USER LOGOUT
     onLogin: handleUserLogin,
     onLogout: handleUserLogout,
     initialized,
+    userProfilePicture,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

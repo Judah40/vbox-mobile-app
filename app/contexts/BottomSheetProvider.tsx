@@ -373,6 +373,11 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                             marginVertical: 8,
                           },
                           content: {
+                            markdown: {
+                              text: {
+                                color: 'white',
+                              },
+                            },
                             containerInner: {
                               backgroundColor: '#18181b',
                               borderRadius: 12,
@@ -455,7 +460,7 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                                   paddingHorizontal: 18,
                                   paddingVertical: 12,
                                   paddingTop: 12,
-                                  color: '#fafafa',
+                                  color: 'white',
                                   fontSize: 15,
                                   lineHeight: 20,
                                   borderWidth: 1.5,
@@ -465,19 +470,6 @@ export const BottomSheetProvider = ({ children }: { children: ReactNode }) => {
                                   fontWeight: '400',
                                 },
                               }}
-                              SendButton={() => (
-                                <TouchableOpacity
-                                  className="ml-2 items-center justify-center rounded-full bg-blue-600 px-6 py-3"
-                                  style={{
-                                    shadowColor: '#2563eb',
-                                    shadowOffset: { width: 0, height: 2 },
-                                    shadowOpacity: 0.3,
-                                    shadowRadius: 4,
-                                    elevation: 4,
-                                  }}>
-                                  <Ionicons name="send" size={18} color="#fff" />
-                                </TouchableOpacity>
-                              )}
                             />
                           </View>
                         </View>

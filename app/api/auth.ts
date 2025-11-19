@@ -111,4 +111,46 @@ export const handleOTPVerification = async (otp: string) => {
   const response = await apiClient.post('/auth/verify-OTP', data);
   return response;
 };
+
+type favoritesType = {
+  name: string;
+};
+export type favoritesArray = {
+  name: favoritesType[];
+};
+
+export const handleAddingFavorites = async (favorite: string[]) => {
+  //
+  const data = {
+    favorites: favorite,
+  };
+  const response = await apiClient.post('/favorite/create', data);
+  return response;
+};
+
+//FORGET PASSWORD
+//EMAIL VERIFICATION
+export const handleForgotPasswordEmailVerification = async (email: string) => {
+  const data = {
+    email: email,
+  };
+  const response = await apiClient.post('/auth/forget-password', data);
+  return response;
+};
+
+//RESET FORGOT PASSWORD
+export const handleResetForgotPassword = async ({
+  newPassword,
+  otp,
+}: {
+  newPassword: string;
+  otp: string;
+}) => {
+  const data = {
+    newPassword,
+    OTP: otp,
+  };
+  const response = await apiClient.patch('/auth/reset-password', data);
+  return response;
+};
 export default { handleLoginUser, handleUserRegistration, authenticateUser };

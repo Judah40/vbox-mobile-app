@@ -178,7 +178,6 @@ export default function ChannelListScreen(): JSX.Element {
         setChannelList(response.data.data);
       })
       .catch((error) => {
-        console.log('Error fetching channels:', error.response?.data || error.message);
         setChannelList([]); // Set empty array on error
       })
       .finally(() => {

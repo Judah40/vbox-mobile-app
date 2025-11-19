@@ -3,6 +3,7 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import { StreamChat } from 'stream-chat';
 import { useAuth } from './AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserProfile, getUserProfilePicture } from '../api/auth';
 const apiKey = process.env.EXPO_PUBLIC_STREAM_TOKEN_API_KEY ?? '';
 
 type conTextType = {
@@ -14,15 +15,43 @@ type Provider = {
 };
 const Streamcontext = createContext<conTextType | null>(null);
 
+type userProps = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  username: string;
+  dateOfBirth: string;
+  gender: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  id?: string;
+};
 export const StreamContextProvider: React.FC<Provider> = ({ children }) => {
   const [client, setClient] = useState<StreamVideoClient | null>(null);
-  const { userDetails, userProfilePicture } = useAuth();
+  const [userDetails, setUserDetails] = useState<userProps | null>(null);
+  const [userProfilePicture, setUserProfilePicture] = useState('');
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
+
+  useEffect(() => {
+    getUserProfile()
+      .then((response) => {
+        setUserDetails(response.data.user);
+      })
+      .catch((err) => {});
+
+    getUserProfilePicture()
+      .then((response) => {
+        setUserProfilePicture(response.data.profilePictureUrl);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
   useEffect(() => {
     const initClient = async () => {
       const token = await AsyncStorage.getItem('streamToken');
 
-      console.log(token, userDetails?.id, userDetails?.firstName, apiKey);
       if (!token || !userDetails?.id || !userDetails?.firstName || !apiKey) {
         console.error('❌ Missing required data to initialize client.');
         return;
@@ -48,8 +77,6 @@ export const StreamContextProvider: React.FC<Provider> = ({ children }) => {
         },
         token
       );
-
-      console.log(chatClient);
       setChatClient(chatClient);
       setClient(streamClient);
     };

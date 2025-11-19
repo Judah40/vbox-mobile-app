@@ -112,9 +112,10 @@ const Register = () => {
                 initialValues={initialValues}
                 onSubmit={async (values) => {
                   setIsLoading(true);
+                  const { confirmPassword, ...restOfData } = values;
                   try {
                     if (onRegister) {
-                      await onRegister(values);
+                      await onRegister(restOfData);
                     } else {
                       console.warn('onRegister is not defined');
                     }

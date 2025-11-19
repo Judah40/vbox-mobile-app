@@ -78,11 +78,6 @@ const UpdatePassword = () => {
   const handleUpdatePassword = async (values: PasswordValues): Promise<void> => {
     setIsLoading(true);
     try {
-      console.log('Update password data:', {
-        oldPassword: values.oldPassword,
-        newPassword: values.newPassword,
-      });
-
       // Call the update password API
       await updatePassword({
         oldPassword: values.oldPassword,

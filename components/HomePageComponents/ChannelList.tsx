@@ -7,6 +7,7 @@ interface Channel {
   channelLogo: string;
   channelName: string;
   lastBroadcast: string | null;
+  isLive: boolean;
 }
 
 interface ChannelListProps {

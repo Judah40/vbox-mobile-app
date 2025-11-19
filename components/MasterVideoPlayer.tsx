@@ -14,16 +14,19 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { Ionicons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { router } from 'expo-router';
+import { handleAddView } from '~/app/api/videos/api';
 
 interface SimpleVideoPlayerProps {
   source: { uri: string };
   title?: string;
   onClose?: () => void;
+  id: string;
 }
 
 const SimpleVideoPlayer: React.FC<SimpleVideoPlayerProps> = ({
   source,
   title = 'Video',
+  id,
   onClose = () => {},
 }) => {
   const videoRef = useRef<VideoView>(null);
@@ -44,7 +47,7 @@ const SimpleVideoPlayer: React.FC<SimpleVideoPlayerProps> = ({
       try {
         await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
       } catch (error) {
-        console.log('Orientation lock error:', error);
+        console.error('Orientation lock error:', error);
       }
     };
 
@@ -74,8 +77,6 @@ const SimpleVideoPlayer: React.FC<SimpleVideoPlayerProps> = ({
     });
 
     const statusSubscription = player.addListener('statusChange', (event) => {
-      console.log('Video status:', event.status);
-
       if (event.status === 'loading') {
         setIsBuffering(true);
       } else if (event.status === 'readyToPlay') {
@@ -104,16 +105,47 @@ const SimpleVideoPlayer: React.FC<SimpleVideoPlayerProps> = ({
     }
   }, [showControls]);
 
-  // Toggle play/pause
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      player.pause();
-    } else {
-      player.play();
-    }
-    setShowControls(true); // Show controls when interacting
-  };
+  //save viewed video
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
+    // poll the player's current time every second (supports player.currentTime or player.getPosition())
+    const startPolling = () => {
+      intervalId = setInterval(async () => {
+        try {
+          const anyPlayer = player as any;
+          const maybeCurrent = anyPlayer?.currentTime;
+          const current =
+            typeof maybeCurrent === 'number'
+              ? maybeCurrent
+              : typeof anyPlayer?.getPosition === 'function'
+                ? await anyPlayer.getPosition()
+                : undefined;
+
+          if (typeof current === 'number' && current >= 30) {
+            await handleAddView({ postId: id });
+            console.log('Video viewed for more than 5 seconds:', source.uri);
+            if (intervalId) {
+              clearInterval(intervalId);
+              intervalId = null;
+            }
+            // Optionally: send server request once here
+            // await handle.post('/post/mark-watched', { videoUri: source.uri });
+          }
+        } catch (error) {
+          console.error('Error checking video time:', error);
+        }
+      }, 1000);
+    };
+
+    startPolling();
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [player, source.uri]);
   // Handle tap on video
   const handleVideoPress = () => {
     setShowControls(!showControls);

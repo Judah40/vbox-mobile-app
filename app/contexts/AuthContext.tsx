@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import auth, { getUserProfile, getUserProfilePicture } from '../api/auth';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 type userProps = {
   firstName: string;
   middleName: string;
@@ -29,6 +30,7 @@ interface AuthProps {
   onLogout: () => Promise<any>;
   initialized: boolean;
   userProfilePicture: string;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<Partial<AuthProps>>({});
@@ -45,14 +47,19 @@ export const AuthProvider = ({ children }: any) => {
   const [initialized, setInitialized] = useState(false);
   const [userDetails, setUserDetails] = useState<userProps | null>(null);
   const [userProfilePicture, setUserProfilePicture] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   /* 
   Auth Checker
   */
   useEffect(() => {
     const authenticate = async () => {
+      const onboardingCompleted = await AsyncStorage.getItem('onboarding');
+      if (!onboardingCompleted) {
+        router.replace('/Onboarding');
+        return;
+      }
       try {
         const response = await auth.authenticateUser();
-        console.log(response.status);
         if (response.status === 200) {
           router.replace('/(app)/Home');
           setAuthState({ authenticated: true });
@@ -77,7 +84,7 @@ HANDLE GET USER DETAILS
         setUserDetails(response.data.user);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
 
     getUserProfilePicture()
@@ -85,25 +92,33 @@ HANDLE GET USER DETAILS
         setUserProfilePicture(response.data.profilePictureUrl);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   }, []);
   /* 
   FUNCTION TO HANDLE USER LOGIN
   */
   const handleUserLogin = async (userLoginCredentials: { email: string; password: string }) => {
-    const response = await auth.handleLoginUser(userLoginCredentials);
-    if (response.data) {
-      await AsyncStorage.setItem('token', response.data.token);
-      await AsyncStorage.setItem('streamToken', response.data.streamToken);
-      console.log(response.data);
+    setIsLoading(true);
 
-      setAuthState({
-        authenticated: true,
-      });
-      router.replace('/(app)/Home');
-    } else {
-      // Alert.alert()
+    try {
+      const response = await auth.handleLoginUser(userLoginCredentials);
+      if (response.data) {
+        await AsyncStorage.setItem('token', response.data.token);
+        await AsyncStorage.setItem('streamToken', response.data.streamToken);
+        setAuthState({
+          authenticated: true,
+        });
+
+        router.replace('/(app)/Home');
+      }
+    } catch (error: unknown) {
+      const message =
+        (error as any)?.response?.data?.message ??
+        (error instanceof Error ? error.message : 'An unexpected error occurred');
+      Alert.alert('Error', message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,7 +127,6 @@ HANDLE GET USER DETAILS
   */
   const handleUserRegistration = async (userRegistrationCredentials: userProps) => {
     const response = await auth.handleUserRegistration(userRegistrationCredentials);
-    console.log(response.data);
     if (response.data) {
       router.push({
         pathname: '/(auth)/otpInput',
@@ -142,6 +156,7 @@ HANDLE USER LOGOUT
     onLogout: handleUserLogout,
     initialized,
     userProfilePicture,
+    isLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

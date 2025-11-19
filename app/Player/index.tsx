@@ -28,9 +28,7 @@ const Player = () => {
   const { url } = useLocalSearchParams();
   const [data, setData] = useState<Post>();
   useEffect(() => {
-    console.log(url);
     handleGetSinglePost(String(url)).then((response) => {
-      console.log(response.data.post);
       setData(response.data.post);
     });
   }, []);
@@ -45,6 +43,7 @@ const Player = () => {
             uri: data?.videoUrl!,
           }}
           title={data?.caption}
+          id={data?.postId!}
         />
       </View>
     </SafeAreaView>

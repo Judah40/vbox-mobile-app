@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
 import {
@@ -12,21 +12,90 @@ import {
   Dimensions,
   Keyboard,
   Pressable,
+  Modal,
 } from 'react-native';
 import CustomTextInput from '~/components/CustomTextInputModified';
 import GradientButton from '~/components/GradientButton';
 import loginValidationSchema from '~/utils/ValidationSchema/userLoginValidationSchema';
 import { useAuth } from '../contexts/AuthContext';
+import { handleForgotPasswordEmailVerification } from '../api/auth';
 
 const initialValues = {
   email: '',
   password: '',
 };
 const screenWidth = Dimensions.get('window').width;
+
+const passwordSetupRender = () => {
+  return (
+    <Formik
+      initialValues={{ email: '' }}
+      validationSchema={require('yup')
+        .object()
+        .shape({
+          email: require('yup')
+            .string()
+            .email('Invalid email address')
+            .required('Email is required'),
+        })}
+      onSubmit={async (values, { setSubmitting, resetForm }) => {
+        try {
+          const response = await handleForgotPasswordEmailVerification(values.email);
+          console.log(response.data.otp);
+          // You can show a success message or navigate to another screen here
+          if (response.status === 200) {
+            router.push({
+              pathname: '/(auth)/Forgetpassword',
+              params: { email: values.email, otp: response.data.otp },
+            });
+          }
+          resetForm();
+        } finally {
+          setSubmitting(false);
+        }
+      }}>
+      {({ errors, handleBlur, handleChange, handleSubmit, values, isSubmitting }) => {
+        return (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}>
+            <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+              <View className="w-full flex-1  justify-center gap-4 bg-black p-4">
+                <View className="w-full items-center">
+                  <Image
+                    source={require('../../assets/vbox.png')}
+                    style={{ width: 80, height: 80 }}
+                  />
+                  <Text className="mb-4 text-lg text-white">Password Recovery</Text>
+                </View>
+
+                <CustomTextInput
+                  label="Email"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  error={errors.email}
+                  placeholder="Enter Email"
+                  keyboardType="email-address"
+                />
+
+                <GradientButton
+                  title="Send Recovery"
+                  onPress={() => handleSubmit()}
+                  isLoading={isSubmitting}
+                />
+              </View>
+            </Pressable>
+          </KeyboardAvoidingView>
+        );
+      }}
+    </Formik>
+  );
+};
 const Login = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { onLogin } = useAuth();
+  const { onLogin, isLoading } = useAuth();
   const router = useRouter();
+  const [isPasswordSetupVisible, setIsPasswordSetupVisible] = useState(false);
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -41,15 +110,7 @@ const Login = () => {
               <Formik
                 initialValues={initialValues}
                 onSubmit={(values) => {
-                  setIsLoading(true);
-                  try {
-                    if (onLogin) onLogin(values);
-                    // console.log(values);
-                  } catch (error) {
-                    console.error(error);
-                  } finally {
-                    setIsLoading(false);
-                  }
+                  if (onLogin) onLogin(values);
                 }}
                 validationSchema={loginValidationSchema}>
                 {({ errors, handleBlur, handleChange, handleSubmit, values }) => {
@@ -75,7 +136,10 @@ const Login = () => {
                       />
 
                       <View style={{ alignItems: 'flex-end' }}>
-                        <Pressable onPress={() => {}}>
+                        <Pressable
+                          onPress={() => {
+                            setIsPasswordSetupVisible(true);
+                          }}>
                           <Text className="text-white underline">Forgot Password?</Text>
                         </Pressable>
                       </View>
@@ -83,7 +147,7 @@ const Login = () => {
                         <GradientButton
                           title="Sign In"
                           onPress={() => handleSubmit()}
-                          isLoading={isLoading}
+                          isLoading={isLoading!}
                         />
                       </View>
                       <View className="flex-row justify-center ">
@@ -99,6 +163,13 @@ const Login = () => {
                   );
                 }}
               </Formik>
+
+              <Modal
+                animationType="slide"
+                visible={isPasswordSetupVisible}
+                onDismiss={() => setIsPasswordSetupVisible(false)}>
+                {passwordSetupRender()}
+              </Modal>
             </Pressable>
           </View>
         </LinearGradient>

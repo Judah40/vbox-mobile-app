@@ -158,7 +158,6 @@ const Profile = () => {
   const handleSaveProfile = async (values: ProfileValues): Promise<void> => {
     setIsLoading(true);
     try {
-      console.log('Save profile data:', values);
       // Simulate API call
 
       await updateUserProfile(values);
@@ -189,9 +188,7 @@ const Profile = () => {
 
     Promise.all([getUserProfile(), getUserProfilePicture()])
       .then(([profileResponse, pictureResponse]) => {
-        console.log(profileResponse.data.user);
         setUserProfile(profileResponse.data.user);
-        console.log(pictureResponse.data.profilePictureUrl);
         setProfilePicture(pictureResponse.data.profilePictureUrl);
       })
       .catch((error) => {

@@ -25,15 +25,11 @@ const OtpVerification = () => {
     setIsLoading(true);
     try {
       // Your OTP verification API call here
-      console.log('Verifying OTP:', otp);
       // await new Promise((resolve) => setTimeout(resolve, 2000));
       const response = await handleOTPVerification(otp);
-
-      console.log(response.data);
-
       await AsyncStorage.setItem('token', response.data.token);
       await AsyncStorage.setItem('streamToken', response.data.streamToken);
-      // router.replace('/(app)/Extras/Favorite');
+      router.replace('/Extras/Favorites');
       // Navigate to next screen on success
       // router.push('/home');
     } catch (error) {
@@ -45,7 +41,6 @@ const OtpVerification = () => {
 
   const handleResendOTP = async () => {
     try {
-      console.log('Resending OTP...');
       // Your resend OTP API call here
       setTimer(60);
       // Start countdown timer
@@ -115,8 +110,9 @@ const OtpVerification = () => {
           {/* Resend Section */}
           <View className="items-center">
             <Text className="mb-2 text-gray-400">Didn't receive the code?</Text>
+            <Text className="mb-2 text-gray-400">Well You are Lying</Text>
 
-            {timer > 0 ? (
+            {/* {timer > 0 ? (
               <Text className="text-gray-500">
                 Resend code in <Text className="font-semibold text-blue-500">{timer}s</Text>
               </Text>
@@ -124,7 +120,7 @@ const OtpVerification = () => {
               <TouchableOpacity onPress={handleResendOTP}>
                 <Text className="text-base font-semibold text-blue-500">Resend Code</Text>
               </TouchableOpacity>
-            )}
+            )} */}
           </View>
         </View>
 

@@ -1,5 +1,6 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 
 import { getAllChannel, handleGetAllPostsByGenre, handleGetSinglePost } from '~/app/api/videos/api';
 import CategoryScrollBar from '~/components/HomePageComponents/CategoryScrollBar';
@@ -30,6 +31,7 @@ export interface Channel {
   channelLogo: string;
   channelName: string;
   lastBroadcast: string | null;
+  isLive: boolean;
 }
 
 const Index = () => {
@@ -59,10 +61,11 @@ const Index = () => {
 
     getAllChannel()
       .then((response) => {
+        console.log(response.data.data);
         setChannelList(response.data.data);
       })
       .catch((error) => {
-        console.log(error.response.data);
+        console.error(error);
       });
   }, []);
   return (
@@ -83,7 +86,16 @@ const Index = () => {
       <ChannelList
         channels={channelList}
         onChannelPress={(channel) => {
-          console.log('Selected channel:', channel);
+          if (channel.isLive) {
+            router.push({
+              pathname: '/(app)/LiveStreamPlayer',
+              params: {
+                id: channel.channelId,
+              },
+            });
+          } else {
+            Alert.alert('Unavailable', ` ${channel.channelName} is currently Not Live`);
+          }
           // Navigate to channel or handle press
         }}
       />

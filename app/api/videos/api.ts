@@ -31,3 +31,17 @@ export const getAllChannel = async () => {
   const response = await apiClient.get('/channel');
   return response;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//GET ALL WATCHED VIDEOS
+export const handleGetMyWatchList = async () => {
+  const response = await apiClient.get('/post/watched/all');
+  return response.data;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//ADD TO WATCHED VIDEOS
+export const handleAddView = async ({ postId }: { postId: string }) => {
+  const response = await apiClient.post(`/views/${postId}`);
+  return response;
+};

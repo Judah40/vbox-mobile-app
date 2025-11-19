@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { ComponentProps, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getUserProfile, getUserProfilePicture } from '~/app/api/auth';
 import { useAuth } from '~/app/contexts/AuthContext';
 // import { string } from 'yup';
 
@@ -24,7 +25,14 @@ const UserProfile = () => {
   // ];
 
   // Menu items to display
-  const menuItems = [
+  type FeatherIconName = ComponentProps<typeof Feather>['name'];
+
+  type MenuItem = {
+    icon: FeatherIconName;
+    label: string;
+    action: () => void;
+  };
+  const menuItems: MenuItem[] = [
     {
       icon: 'bookmark',
       label: 'Saved Videos',
@@ -37,8 +45,8 @@ const UserProfile = () => {
       icon: 'clock',
       label: 'Watch History',
       action: () => {
-        // router.push('/(app)/Account/Watch')
-        Alert.alert('Coming soon');
+        router.push('/(app)/Account/Watch');
+        // Alert.alert('Coming soon');
       },
     },
     {
@@ -66,7 +74,6 @@ const UserProfile = () => {
       icon: 'help-circle',
       label: 'Help & Support',
       action: () => {
-        // console.log('Help')
         Alert.alert('Coming soon');
       },
     },
@@ -80,10 +87,37 @@ const UserProfile = () => {
       },
     },
   ];
+  const { onLogout } = useAuth();
 
-  const { userProfilePicture, userDetails, onLogout } = useAuth();
+  type userProps = {
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    username: string;
+    dateOfBirth: string;
+    gender: string;
+    email: string;
+    address: string;
+    phoneNumber: string;
+    id?: string;
+  };
+  const [userDetails, setUserDetails] = useState<userProps | null>(null);
+  const [userProfilePicture, setUserProfilePicture] = useState('');
+  useEffect(() => {
+    getUserProfile()
+      .then((response) => {
+        setUserDetails(response.data.user);
+      })
+      .catch((err) => {});
 
-  useEffect(() => {}, [userProfilePicture, userDetails]);
+    getUserProfilePicture()
+      .then((response) => {
+        setUserProfilePicture(response.data.profilePictureUrl);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
   return (
     <ScrollView className="flex-1 bg-black">
       <SafeAreaView>
